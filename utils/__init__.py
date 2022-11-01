@@ -118,6 +118,7 @@ def reset_user_data_context(context: CallbackContext) -> None:
         'convert_video_to_circle': False,
         'convert_audio_to_voice': False,
         'edit_tag_music': False,
+        'download_from_link': False,
         'voice_path': '',
         'voice_art_path': '',
         'new_voice_art_path': '',

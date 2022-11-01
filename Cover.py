@@ -430,9 +430,49 @@ def show_module_selector_voice(update: Update, context: CallbackContext) -> None
     )
 
 def handle_download_message(update: Update, context: CallbackContext) -> None:
+    user_data = context.user_data
     message = update.message
     user_id = update.effective_user.id
-    context.bot.send_document(user_id, message.text)
+    # context.bot.send_document(user_id, message.text)
+    lang = user_data['language']
+
+    tag_editor_keyboard = generate_tag_editor_keyboard(lang)
+
+    if video_path:
+        # with open(video_path, 'rb') as video_file:
+        #     message.reply_video_note(
+        #         video_note=video_file,
+        #         reply_to_message_id=update.effective_message.message_id,
+        #         reply_markup=tag_editor_keyboard,
+        #     )
+        try:
+            # file_download_path = download_file(
+            #     user_id=user_id,
+            #     file_to_download=message.photo[len(message.photo) - 1],
+            #     file_type='photo',
+            #     context=context
+            # )
+            reply_message = f"{translate_key_to(lp.ALBUM_ART_CHANGED, lang)} " \
+                            f"{translate_key_to(lp.CLICK_PREVIEW_MESSAGE, lang)} " \
+                            f"{translate_key_to(lp.OR, lang).upper()} " \
+                            f"{translate_key_to(lp.CLICK_DONE_MESSAGE, lang).lower()}"
+            user_data['video_path'] = video_path
+            user_data['download_from_link'] = True
+            message.reply_text(reply_message, reply_markup=tag_editor_keyboard)
+        except (ValueError, BaseException):
+            message.reply_text(translate_key_to(lp.ERR_ON_DOWNLOAD_AUDIO_MESSAGE, lang))
+            logger.error(
+                "Error on downloading %s's file. File type: Photo",
+                user_id,
+                exc_info=True
+            )
+            return
+    else:
+        message.reply_text(
+            generate_music_info(tag_editor_context).format(f"\n🆔 {BOT_USERNAME}"),
+            reply_to_message_id=update.effective_message.message_id,
+            reply_markup=tag_editor_keyboard
+        )
 
 def handle_convert_video_message(update: Update, context: CallbackContext) -> None:
     message = update.message
@@ -467,6 +507,7 @@ def handle_convert_video_message(update: Update, context: CallbackContext) -> No
                             f"{translate_key_to(lp.OR, lang).upper()} " \
                             f"{translate_key_to(lp.CLICK_DONE_MESSAGE, lang).lower()}"
             user_data['video_path'] = video_path
+            user_data['convert_video_to_circle'] = True
             message.reply_text(reply_message, reply_markup=tag_editor_keyboard)
         except (ValueError, BaseException):
             message.reply_text(translate_key_to(lp.ERR_ON_DOWNLOAD_AUDIO_MESSAGE, lang))
@@ -518,6 +559,7 @@ def handle_convert_video_to_gif_message(update: Update, context: CallbackContext
                             f"{translate_key_to(lp.OR, lang).upper()} " \
                             f"{translate_key_to(lp.CLICK_DONE_MESSAGE, lang).lower()}"
             user_data['video_path'] = video_path
+            user_data['convert_video_to_gif'] = True
             message.reply_text(reply_message, reply_markup=tag_editor_keyboard)
         except (ValueError, BaseException):
             message.reply_text(translate_key_to(lp.ERR_ON_DOWNLOAD_AUDIO_MESSAGE, lang))
@@ -567,6 +609,7 @@ def handle_convert_voice_message(update: Update, context: CallbackContext) -> No
                             f"{translate_key_to(lp.OR, lang).upper()} " \
                             f"{translate_key_to(lp.CLICK_DONE_MESSAGE, lang).lower()}"
             user_data['voice_path'] = voice_path
+            user_data['convert_audio_to_voice'] = True
             message.reply_text(reply_message, reply_markup=tag_editor_keyboard)
         except (ValueError, BaseException):
             message.reply_text(translate_key_to(lp.ERR_ON_DOWNLOAD_AUDIO_MESSAGE, lang))
@@ -768,6 +811,8 @@ def finish(update: Update, context: CallbackContext) -> None:
     convert_video_to_circle = user_data['convert_video_to_circle']
     convert_audio_to_voice = user_data['convert_audio_to_voice']
     edit_tag_music = user_data['edit_tag_music']
+    download_from_link = user_data['download_from_link']
+
     lang = user_data['language']
 
     start_over_button_keyboard = generate_start_over_keyboard(lang)
@@ -798,6 +843,16 @@ def finish(update: Update, context: CallbackContext) -> None:
             logger.exception("Telegram error: %s", error)
 
     elif convert_video_to_circle == True:
+        context.bot.send_chat_action(
+        chat_id=update.message.chat_id,
+        action=ChatAction.UPLOAD_VIDEO
+        )
+
+        video_path = user_data['video_path']
+
+        lang = user_data['language']
+        video_file = open(video_path, 'rb').read()
+        video_to_gif(video_path, user_data)
         try:
             with open(video_path, 'rb') as video_file:
                 message.reply_video_note(
@@ -867,6 +922,21 @@ def finish(update: Update, context: CallbackContext) -> None:
                     thumb=thumb,
                     reply_markup=start_over_button_keyboard,
                     reply_to_message_id=user_data['music_message_id']
+                )
+        except (TelegramError, BaseException) as error:
+            message.reply_text(
+                translate_key_to(lp.ERR_ON_UPLOADING, lang),
+                reply_markup=start_over_button_keyboard
+            )
+            logger.exception("Telegram error: %s", error)
+    elif download_from_link == True:
+        try:
+            with open(new_voice_path, 'rb') as voice:
+                context.bot.send_document(user_id, message.text)
+                message.reply_voice(
+                    voice=voice,
+                    reply_to_message_id=update.effective_message.message_id,
+                    reply_markup=start_over_button_keyboard,
                 )
         except (TelegramError, BaseException) as error:
             message.reply_text(
@@ -1121,15 +1191,15 @@ def main():
     add_handler(CommandHandler('help', command_help))
     add_handler(CommandHandler('about', command_about))
     ##########
-    add_handler(CommandHandler('vdone', finish_convert_video))
-    add_handler(CommandHandler('vpreview', display_preview_video))
-    ##########
-    ##########
-    add_handler(CommandHandler('vadone', finish_convert_voice_to_audio))
-    add_handler(CommandHandler('vapreview', display_preview_video))
+    # add_handler(CommandHandler('vdone', finish_convert_video))
+    # add_handler(CommandHandler('vpreview', display_preview_video))
+    # ##########
+    # ##########
+    # add_handler(CommandHandler('vadone', finish_convert_voice_to_audio))
+    # add_handler(CommandHandler('vapreview', display_preview_video))
     ##########
     add_handler(MessageHandler(
-        (Filters.regex('^(🆕 New File)$') | Filters.regex('^(🆕 فایل جدید)$')),
+        (Filters.regex('^(🆕 New File or Link)$') | Filters.regex('^(🆕 فایل یا لینک جدید)$')),
         start_over)
     )
     add_handler(MessageHandler(
