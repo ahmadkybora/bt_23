@@ -430,49 +430,59 @@ def show_module_selector_voice(update: Update, context: CallbackContext) -> None
     )
 
 def handle_download_message(update: Update, context: CallbackContext) -> None:
-    user_data = context.user_data
     message = update.message
+    instagram_post = message.text
     user_id = update.effective_user.id
-    # context.bot.send_document(user_id, message.text)
-    lang = user_data['language']
+    user_data = context.user_data
+    logging.error(instagram_post)
 
-    tag_editor_keyboard = generate_tag_editor_keyboard(lang)
+    if "instagram.com" in instagram_post:
+        changing_url = instagram_post.split("/")
+        url_code = changing_url[4]
+        url = f"https://instagram.com/p/{url_code}?__a=1"
+        logging.error(url_code)
 
-    if video_path:
-        # with open(video_path, 'rb') as video_file:
-        #     message.reply_video_note(
-        #         video_note=video_file,
-        #         reply_to_message_id=update.effective_message.message_id,
-        #         reply_markup=tag_editor_keyboard,
-        #     )
-        try:
-            # file_download_path = download_file(
-            #     user_id=user_id,
-            #     file_to_download=message.photo[len(message.photo) - 1],
-            #     file_type='photo',
-            #     context=context
-            # )
-            reply_message = f"{translate_key_to(lp.ALBUM_ART_CHANGED, lang)} " \
-                            f"{translate_key_to(lp.CLICK_PREVIEW_MESSAGE, lang)} " \
-                            f"{translate_key_to(lp.OR, lang).upper()} " \
-                            f"{translate_key_to(lp.CLICK_DONE_MESSAGE, lang).lower()}"
-            user_data['video_path'] = video_path
-            user_data['download_from_link'] = True
-            message.reply_text(reply_message, reply_markup=tag_editor_keyboard)
-        except (ValueError, BaseException):
-            message.reply_text(translate_key_to(lp.ERR_ON_DOWNLOAD_AUDIO_MESSAGE, lang))
-            logger.error(
-                "Error on downloading %s's file. File type: Photo",
-                user_id,
-                exc_info=True
-            )
-            return
-    else:
-        message.reply_text(
-            generate_music_info(tag_editor_context).format(f"\n🆔 {BOT_USERNAME}"),
-            reply_to_message_id=update.effective_message.message_id,
-            reply_markup=tag_editor_keyboard
-        )
+    # user_id = update.effective_user.id
+    # # context.bot.send_document(user_id, message.text)
+    # lang = user_data['language']
+
+    # tag_editor_keyboard = generate_tag_editor_keyboard(lang)
+
+    # if video_path:
+    #     # with open(video_path, 'rb') as video_file:
+    #     #     message.reply_video_note(
+    #     #         video_note=video_file,
+    #     #         reply_to_message_id=update.effective_message.message_id,
+    #     #         reply_markup=tag_editor_keyboard,
+    #     #     )
+    #     try:
+    #         # file_download_path = download_file(
+    #         #     user_id=user_id,
+    #         #     file_to_download=message.photo[len(message.photo) - 1],
+    #         #     file_type='photo',
+    #         #     context=context
+    #         # )
+    #         reply_message = f"{translate_key_to(lp.ALBUM_ART_CHANGED, lang)} " \
+    #                         f"{translate_key_to(lp.CLICK_PREVIEW_MESSAGE, lang)} " \
+    #                         f"{translate_key_to(lp.OR, lang).upper()} " \
+    #                         f"{translate_key_to(lp.CLICK_DONE_MESSAGE, lang).lower()}"
+    #         user_data['video_path'] = video_path
+    #         user_data['download_from_link'] = True
+    #         message.reply_text(reply_message, reply_markup=tag_editor_keyboard)
+    #     except (ValueError, BaseException):
+    #         message.reply_text(translate_key_to(lp.ERR_ON_DOWNLOAD_AUDIO_MESSAGE, lang))
+    #         logger.error(
+    #             "Error on downloading %s's file. File type: Photo",
+    #             user_id,
+    #             exc_info=True
+    #         )
+    #         return
+    # else:
+    #     message.reply_text(
+    #         generate_music_info(tag_editor_context).format(f"\n🆔 {BOT_USERNAME}"),
+    #         reply_to_message_id=update.effective_message.message_id,
+    #         reply_markup=tag_editor_keyboard
+    #     )
 
 def handle_convert_video_message(update: Update, context: CallbackContext) -> None:
     message = update.message
@@ -806,6 +816,7 @@ def finish_convert_video(update: Update, context: CallbackContext) -> None:
 def finish(update: Update, context: CallbackContext) -> None:
     message = update.message
     user_data = context.user_data
+    user_id = update.effective_user.id
 
     covert_video_to_gif = user_data['convert_video_to_gif']
     convert_video_to_circle = user_data['convert_video_to_circle']
@@ -931,13 +942,12 @@ def finish(update: Update, context: CallbackContext) -> None:
             logger.exception("Telegram error: %s", error)
     elif download_from_link == True:
         try:
-            with open(new_voice_path, 'rb') as voice:
-                context.bot.send_document(user_id, message.text)
-                message.reply_voice(
-                    voice=voice,
-                    reply_to_message_id=update.effective_message.message_id,
-                    reply_markup=start_over_button_keyboard,
-                )
+            context.bot.send_document(user_id, message.text)
+            message.reply_voice(
+                voice=voice,
+                reply_to_message_id=update.effective_message.message_id,
+                reply_markup=start_over_button_keyboard,
+            )
         except (TelegramError, BaseException) as error:
             message.reply_text(
                 translate_key_to(lp.ERR_ON_UPLOADING, lang),
