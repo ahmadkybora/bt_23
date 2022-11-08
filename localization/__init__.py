@@ -24,6 +24,7 @@ ERR_CREATING_USER_FOLDER = "ERR_CREATING_USER_FOLDER"
 ERR_ON_DOWNLOAD_AUDIO_MESSAGE = "ERR_ON_DOWNLOAD_AUDIO_MESSAGE"
 ERR_ON_DOWNLOAD_VIDEO_MESSAGE = "ERR_ON_DOWNLOAD_VIDEO_MESSAGE"
 ERR_ON_DOWNLOAD_PHOTO_MESSAGE = "ERR_ON_DOWNLOAD_PHOTO_MESSAGE"
+ERR_ON_DOWNLOAD_LINK_MESSAGE = "ERR_ON_DOWNLOAD_LINK_MESSAGE"
 ERR_TOO_LARGE_FILE = "ERR_TOO_LARGE_FILE"
 ERR_ON_READING_TAGS = "ERR_ON_READING_TAGS"
 ERR_ON_UPDATING_TAGS = "ERR_ON_UPDATING_TAGS"
@@ -70,7 +71,7 @@ keys = {
               "📥 Download video via Instagram link \n\n\n"
 
 
-              "⚠️ To start, please send a song/video: (You can download or upload directly!)",
+              "⚠️ To start, please send a song/video/link: (You can download or upload directly!)",
         "fa": "سلام! 👋\n"
               "موزیک جوجو هستم؛ می‌تونیم کارای زیر رو باهم انجام بدیم 👇\n\n\n"
 
@@ -91,7 +92,7 @@ keys = {
               "📥 دانلود ویدیو از طریق لینک اینستاگرام \n\n\n"
 
 
-              "⚠️ برای شروع لطفا یه آهنگی/فیلمی چیزی بفرست: (می‌تونی فروارد کنی یا مستقیم آپلود کنی!)"
+              "⚠️ برای شروع لطفا یه آهنگی/فیلمی/لینکی چیزی بفرست: (می‌تونی فروارد کنی یا مستقیم آپلود کنی!)"
     },
     START_OVER_MESSAGE: {
         "en": "Send me a song/video/link and see how awesome I am!",
@@ -166,16 +167,20 @@ keys = {
         "fa": f"به مشکل خوردم... {REPORT_BUG_MESSAGE_FA}",
     },
     ERR_ON_DOWNLOAD_AUDIO_MESSAGE: {
-        "en": f"Sorry, I couldn't download your file... {REPORT_BUG_MESSAGE_EN}",
-        "fa": f"متاسفم، نتونستم فایلت رو دانلود کنم... {REPORT_BUG_MESSAGE_FA}",
+        "en": f"Sorry, I couldn't download your audio... {REPORT_BUG_MESSAGE_EN}",
+        "fa": f"متاسفم، نتونستم موزیکت رو دانلود کنم... {REPORT_BUG_MESSAGE_FA}",
     },
     ERR_ON_DOWNLOAD_PHOTO_MESSAGE: {
-        "en": f"Sorry, I couldn't download your file... {REPORT_BUG_MESSAGE_EN}",
-        "fa": f"متاسفم، نتونستم فایلت رو دانلود کنم... {REPORT_BUG_MESSAGE_FA}",
+        "en": f"Sorry, I couldn't download your photo... {REPORT_BUG_MESSAGE_EN}",
+        "fa": f"متاسفم، نتونستم عکست رو دانلود کنم... {REPORT_BUG_MESSAGE_FA}",
     },
     ERR_ON_DOWNLOAD_VIDEO_MESSAGE: {
-        "en": f"Sorry, I couldn't download your file... {REPORT_BUG_MESSAGE_EN}",
-        "fa": f"متاسفم، نتونستم فایلت رو دانلود کنم... {REPORT_BUG_MESSAGE_FA}",
+        "en": f"Sorry, I couldn't download your video... {REPORT_BUG_MESSAGE_EN}",
+        "fa": f"متاسفم، نتونستم ویدیوت رو دانلود کنم... {REPORT_BUG_MESSAGE_FA}",
+    },
+    ERR_ON_DOWNLOAD_LINK_MESSAGE: {
+        "en": f"Sorry, I couldn't download your link... {REPORT_BUG_MESSAGE_EN}",
+        "fa": f"متاسفم، نتونستم لینکت رو دانلود کنم... {REPORT_BUG_MESSAGE_FA}",
     },
     ERR_TOO_LARGE_FILE: {
         "en": "This file is too big that I can process, sorry!",

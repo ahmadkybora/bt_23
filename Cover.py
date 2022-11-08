@@ -432,27 +432,41 @@ def show_module_selector_voice(update: Update, context: CallbackContext) -> None
 
 def handle_download_message(update: Update, context: CallbackContext) -> None:
     message = update.message
-    instagram_post = message.text
+    url = message.text
     user_id = update.effective_user.id
     user_data = context.user_data
+    lang = user_data['language']
 
-    url = message.text
-    r = requests.get(url, stream=True)
+    start_over_button_keyboard = generate_start_over_keyboard(lang)
+    response = requests.get(url)
 
-    logging.error(r)
-    if "instagram.com" in instagram_post:
+
+    try:
+        s = context.bot.get_file(update.message.document).download()
+        r = open("file", "wb").write(s)
+        # with open("custom/file.doc", 'wb') as f:
+        #     context.bot.get_file(update.message.document).download(out=f)
+
+        # r = open("file", "wb").write(response.content)
+        logging.error(r)
+    except:
+        pass
+    if "instagram.com" in url:
         pass
     else:
         try:
             context.bot.send_document(
-                user_id, 
-                message.text
+                document=url,
+                chat_id=update.message.chat_id,
+                caption=f"🆔 {BOT_USERNAME}",
+                reply_markup=start_over_button_keyboard,
             )
-        except:
-            context.bot.sendMessage(
-                chat_id=update.message.chat_id, 
-                text="لینک دانلود مشکل دارد"
+        except (TelegramError, BaseException) as error:
+            message.reply_text(
+                translate_key_to(lp.ERR_ON_DOWNLOAD_LINK_MESSAGE, lang),
+                reply_markup=start_over_button_keyboard
             )
+            logger.exception("Telegram error: %s", error)
 
     # if "instagram.com" in instagram_post:
     #     changing_url = instagram_post.split("/")
