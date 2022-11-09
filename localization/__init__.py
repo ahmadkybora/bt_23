@@ -8,6 +8,10 @@ DEFAULT_MESSAGE = "DEFAULT_MESSAGE"
 ASK_WHICH_MODULE = "ASK_WHICH_MODULE"
 ASK_WHICH_TAG = "ASK_WHICH_TAG"
 ASK_FOR_ALBUM = "ASK_FOR_ALBUM"
+ASK_FOR_ARTIST = "ASK_FOR_ARTIST"
+ASK_FOR_TITLE = "ASK_FOR_TITLE"
+ASK_FOR_GENRE = "ASK_FOR_GENRE"
+ASK_FOR_YEAR = "ASK_FOR_YEAR"
 ASK_FOR_ALBUM_ART = "ASK_FOR_ALBUM_ART"
 ALBUM_ART_CHANGED = "ALBUM_ART_CHANGED"
 EXPECTED_NUMBER_MESSAGE = "EXPECTED_NUMBER_MESSAGE"
@@ -37,10 +41,20 @@ BTN_CONVERT_VIDEO_TO_CIRCLE = "BTN_CONVERT_VIDEO_TO_CIRCLE"
 BTN_CONVERT_VIDEO_TO_GIF = "BTN_CONVERT_VIDEO_TO_GIF"
 BTN_MUSIC_TO_VOICE_CONVERTER = "BTN_MUSIC_TO_VOICE_CONVERTER"
 BTN_CONVERT_VOICE_TO_AUDIO = "BTN_CONVERT_VOICE_TO_AUDIO"
+BTN_MUSIC_CUTTER = "BTN_MUSIC_CUTTER"
+BTN_BITRATE_CHANGER = "BTN_BITRATE_CHANGER"
+BTN_ARTIST = "BTN_ARTIST"
+BTN_TITLE = "BTN_TITLE"
 BTN_ALBUM = "BTN_ALBUM"
+BTN_GENRE = "BTN_GENRE"
+BTN_YEAR = "BTN_YEAR"
 BTN_ALBUM_ART = "BTN_ALBUM_ART"
+BTN_DISK_NUMBER = "BTN_DISK_NUMBER"
+BTN_TRACK_NUMBER = "BTN_TRACK_NUMBER"
 BTN_BACK = "BTN_BACK"
+BTN_ALBUM = "BTN_ALBUM"
 BTN_NEW_FILE = "BTN_NEW_FILE"
+MUSIC_CUTTER_HELP = "MUSIC_CUTTER_HELP"
 DONE = "DONE"
 OR = "OR"
 
@@ -121,6 +135,26 @@ keys = {
     ALBUM_ART_CHANGED: {
         "en": "Album art changed",
         "fa": "عکس آلبوم تغییر یافت.",
+    },
+        ASK_FOR_ALBUM: {
+        "en": "Enter the name of the album:",
+        "fa": "نام آلبوم را وارد کنید:",
+    },
+    ASK_FOR_ARTIST: {
+        "en": "Enter the name of the artist:",
+        "fa": "نام خواننده رو وارد کنید:",
+    },
+    ASK_FOR_TITLE: {
+        "en": "Enter the title:",
+        "fa": "عنوان رو وارد کنید:",
+    },
+    ASK_FOR_GENRE: {
+        "en": "Enter the genre:",
+        "fa": "ژانر رو وارد کنید:",
+    },
+    ASK_FOR_YEAR: {
+        "en": "Enter the publish year:",
+        "fa": "سال انتشار رو وارد کنید:",
     },
     ASK_FOR_ALBUM_ART: {
         "en": "Send me a photo:",
@@ -206,6 +240,38 @@ keys = {
         "en": "🎵 Tag Editor",
         "fa": "🎵 تغییر تگ ها",
     },
+    BTN_MUSIC_TO_VOICE_CONVERTER: {
+        "en": "🗣 Music to Voice Converter",
+        "fa": "🗣 تبدیل به پیام صوتی",
+    },
+    BTN_MUSIC_CUTTER: {
+        "en": "✂️ Music Cutter",
+        "fa": "✂️ بریدن آهنگ",
+    },
+    BTN_BITRATE_CHANGER: {
+        "en": "🎙 Bitrate Changer",
+        "fa": "🎙 تغییر بیت ریت",
+    },
+    BTN_ARTIST: {
+        "en": "🗣 Artist",
+        "fa": "🗣 خواننده",
+    },
+    BTN_TITLE: {
+        "en": "🎵 Title",
+        "fa": "🎵 عنوان",
+    },
+    BTN_ALBUM: {
+        "en": "🎼 Album",
+        "fa": "🎼 آلبوم",
+    },
+    BTN_GENRE: {
+        "en": "🎹 Genre",
+        "fa": "🎹 ژانر",
+    },
+    BTN_YEAR: {
+        "en": "📅 Year",
+        "fa": "📅 سال",
+    },
     BTN_CONVERT_VIDEO_TO_CIRCLE: {
         "en": "🎥 convert to circular video",
         "fa": "🎥 تبدیل به ویدیو دایره‌ای",
@@ -226,6 +292,14 @@ keys = {
         "en": "🖼 Album Art",
         "fa": "🖼 عکس آلبوم",
     },
+    BTN_DISK_NUMBER: {
+        "en": "💿 Disk Number",
+        "fa": "💿  شماره دیسک",
+    },
+    BTN_TRACK_NUMBER: {
+        "en": "▶️ Track Number",
+        "fa": "▶️ شماره ترک",
+    },
     BTN_BACK: {
         "en": "🔙 Back",
         "fa": "🔙 بازگشت",
@@ -233,6 +307,26 @@ keys = {
     BTN_NEW_FILE: {
         "en": "🆕 New File or Link",
         "fa": "🆕 فایل یا لینک جدید",
+    },
+    MUSIC_CUTTER_HELP: {
+        "en": "\n\nNow send me which part of the music you want to cut out?\n"
+              "The file length is {}.\n\n"
+              "Valid patterns are:\n"
+              f"*mm:ss-mm:ss*:\n{EG_EN} 00:10-02:30\n"
+              F"*ss-ss*:\n{EG_EN} 75-120\n\n"
+              "- m = minute, s = second\n"
+              "- Leading zeroes are optional\n"
+              "- Extra spaces are ignored\n"
+              "- Only English numbers are valid",
+        "fa": "\n\nحالا بهم بگو کجای موزیک رو میخوای ببری؟\n"
+              "طول فایل {} است.\n\n"
+              "الگو های مجاز:\n"
+              f"*mm:ss-mm:ss*:\n{EG_FA} 00:10-02:30\n"
+              f"*ss-ss*:\n{EG_FA} 75-120\n\n"
+              "- دقیقه: m، ثانیه s\n"
+              "- صفرهای ابتدایی دل بخواه هستن\n"
+              "- فاصله های اضافی در نظر گرفته نمیشن\n"
+              "- تنها اعداد انگلیسی مجاز هستند",
     },
     DONE: {
         "en": "Done!",

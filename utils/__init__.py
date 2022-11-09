@@ -157,6 +157,26 @@ def create_user_directory(user_id: int) -> str:
 
     return user_download_dir
 
+def convert_seconds_to_human_readable_form(seconds: int) -> str:
+    """Convert seconds to human readable time format, e.g. 02:30
+
+    **Keyword arguments:**
+     - seconds (int) -- Seconds to convert
+
+    **Returns:**
+     Formatted string
+    """
+    if seconds <= 0:
+        return "00:00"
+
+    minutes = int(seconds / 60)
+    remainder = seconds % 60
+
+    minutes_formatted = str(minutes) if minutes >= 10 else "0" + str(minutes)
+    seconds_formatted = str(remainder) if remainder >= 10 else "0" + str(remainder)
+
+    return f"{minutes_formatted}:{seconds_formatted}"
+
 def download_file(user_id: int, file_to_download, file_type: str, context: CallbackContext) -> str:
     """Download a file using convenience methods of "python-telegram-bot"
 
@@ -210,6 +230,26 @@ def download_file(user_id: int, file_to_download, file_type: str, context: Callb
 
     return file_download_path
 
+def generate_back_button_keyboard(language: str) -> ReplyKeyboardMarkup:
+    """Create an return an instance of `back_button_keyboard`
+
+
+    **Keyword arguments:**
+     - language (str) -- The desired language to generate labels
+
+    **Returns:**
+     ReplyKeyboardMarkup instance
+    """
+    return (
+        ReplyKeyboardMarkup(
+            [
+                [translate_key_to('BTN_BACK', language)],
+            ],
+            resize_keyboard=True,
+            one_time_keyboard=True,
+        )
+    )
+
 def generate_start_over_keyboard(language: str) -> ReplyKeyboardMarkup:
     """Create an return an instance of `start_over_keyboard`
 
@@ -234,7 +274,6 @@ def generate_start_over_keyboard(language: str) -> ReplyKeyboardMarkup:
 def generate_module_selector_keyboard(language: str) -> ReplyKeyboardMarkup:
     """Create an return an instance of `module_selector_keyboard`
 
-
     **Keyword arguments:**
      - language (str) -- The desired language to generate labels
 
@@ -246,7 +285,12 @@ def generate_module_selector_keyboard(language: str) -> ReplyKeyboardMarkup:
             [
                 [
                     translate_key_to('BTN_TAG_EDITOR', language),
+                    translate_key_to('BTN_MUSIC_TO_VOICE_CONVERTER', language)
                 ],
+                [
+                    translate_key_to('BTN_MUSIC_CUTTER', language),
+                    translate_key_to('BTN_BITRATE_CHANGER', language)
+                ]
             ],
             resize_keyboard=True,
             one_time_keyboard=True,
@@ -312,8 +356,22 @@ def generate_tag_editor_keyboard(language: str) -> ReplyKeyboardMarkup:
         ReplyKeyboardMarkup(
             [
                 [
+                    translate_key_to('BTN_ARTIST', language),
+                    translate_key_to('BTN_TITLE', language),
+                    translate_key_to('BTN_ALBUM', language)
+                ],
+                [
+                    translate_key_to('BTN_GENRE', language),
+                    translate_key_to('BTN_YEAR', language),
                     translate_key_to('BTN_ALBUM_ART', language)
                 ],
+                [
+                    translate_key_to('BTN_DISK_NUMBER', language),
+                    translate_key_to('BTN_TRACK_NUMBER', language)
+                ],
+                [
+                    translate_key_to('BTN_BACK', language)
+                ]
             ],
             resize_keyboard=True,
         )

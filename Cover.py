@@ -13,8 +13,8 @@ from telegram import (
 )
 
 import localization as lp
-from utils import translate_key_to, reset_user_data_context, generate_start_over_keyboard, \
-create_user_directory, download_file, increment_usage_counter_for_user, delete_file, \
+from utils import translate_key_to, reset_user_data_context, generate_start_over_keyboard, convert_seconds_to_human_readable_form, \
+create_user_directory, download_file, generate_back_button_keyboard, increment_usage_counter_for_user, delete_file, \
 generate_module_selector_keyboard, generate_module_selector_video_keyboard, generate_tag_editor_keyboard, \
 generate_music_info, generate_tag_editor_video_keyboard, generate_module_selector_voice_keyboard, save_tags_to_file, \
 ffmpegcommand, myffmpegcommand, video_to_gif
@@ -214,7 +214,6 @@ def handle_music_message(update: Update, context: CallbackContext) -> None:
         return
 
     try:
-        logging.error(message.audio)
         file_download_path = download_file(
             user_id=user_id,
             file_to_download=message.audio,
@@ -468,82 +467,6 @@ def handle_download_message(update: Update, context: CallbackContext) -> None:
             )
             logger.exception("Telegram error: %s", error)
 
-    # if "instagram.com" in instagram_post:
-    #     changing_url = instagram_post.split("/")
-    #     url_code = changing_url[4]
-    #     url = f"https://instagram.com/p/{url_code}?__a=1"
-
-    #     try:
-    #         global checking_video
-    #         visit = requests.get(url).json()
-    #         checking_video = visit['graphql']['shortcode_media']['is_video']
-    #         logging.error(checking_video)
-    #     except:
-    #         context.bot.sendMessage(chat_id=update.message.chat_id, text="Send Me Only Public Instagram Posts ⚡️")
-        
-    #     if checking_video==True:
-    #         try:
-    #             video_url = visit['graphql']['shortcode_media']['video_url']
-    #             context.bot.send_chat_action(chat_id=update.message.chat_id, action="upload_video")
-    #             context.bot.sendVideo(chat_id=update.message.chat_id, video=video_url)
-    #         except:
-    #             pass
-
-    #     elif checking_video==False:
-    #         try:
-    #             post_url = visit['graphql']['shortcode_media']['display_url']
-    #             context.bot.send_chat_action(chat_id=update.message.chat_id, action="upload_photo")
-    #             context.bot.sendPhoto(chat_id=update.message.chat_id, photo=post_url)
-    #         except:
-    #             pass
-    #     else:
-    #         context.bot.send_chat_action(chat_id=update.message.chat_id, action="typing")
-    #         context.bot.sendMessage(chat_id=update.message.chat_id, text="I Cant Send You Private Posts :-( ")
-    # else:
-    #     context.bot.sendMessage(chat_id=update.message.chat_id, text="Kindly Send Me Public Instagram Video/Photo Url")
-
-    # user_id = update.effective_user.id
-    # # context.bot.send_document(user_id, message.text)
-    # lang = user_data['language']
-
-    # tag_editor_keyboard = generate_tag_editor_keyboard(lang)
-
-    # if video_path:
-    #     # with open(video_path, 'rb') as video_file:
-    #     #     message.reply_video_note(
-    #     #         video_note=video_file,
-    #     #         reply_to_message_id=update.effective_message.message_id,
-    #     #         reply_markup=tag_editor_keyboard,
-    #     #     )
-    #     try:
-    #         # file_download_path = download_file(
-    #         #     user_id=user_id,
-    #         #     file_to_download=message.photo[len(message.photo) - 1],
-    #         #     file_type='photo',
-    #         #     context=context
-    #         # )
-    #         reply_message = f"{translate_key_to(lp.ALBUM_ART_CHANGED, lang)} " \
-    #                         f"{translate_key_to(lp.CLICK_PREVIEW_MESSAGE, lang)} " \
-    #                         f"{translate_key_to(lp.OR, lang).upper()} " \
-    #                         f"{translate_key_to(lp.CLICK_DONE_MESSAGE, lang).lower()}"
-    #         user_data['video_path'] = video_path
-    #         user_data['download_from_link'] = True
-    #         message.reply_text(reply_message, reply_markup=tag_editor_keyboard)
-    #     except (ValueError, BaseException):
-    #         message.reply_text(translate_key_to(lp.ERR_ON_DOWNLOAD_AUDIO_MESSAGE, lang))
-    #         logger.error(
-    #             "Error on downloading %s's file. File type: Photo",
-    #             user_id,
-    #             exc_info=True
-    #         )
-    #         return
-    # else:
-    #     message.reply_text(
-    #         generate_music_info(tag_editor_context).format(f"\n🆔 {BOT_USERNAME}"),
-    #         reply_to_message_id=update.effective_message.message_id,
-    #         reply_markup=tag_editor_keyboard
-    #     )
-
 def handle_convert_video_message(update: Update, context: CallbackContext) -> None:
     message = update.message
     user_id = update.effective_user.id
@@ -779,6 +702,144 @@ def handle_music_tag_editor(update: Update, context: CallbackContext) -> None:
             reply_to_message_id=update.effective_message.message_id,
             reply_markup=tag_editor_keyboard
         )
+
+def handle_music_cutter(update: Update, context: CallbackContext) -> None:
+    user_data = context.user_data
+    user_data['current_active_module'] = 'music_cutter'
+    lang = user_data['language']
+
+    back_button_keyboard = generate_back_button_keyboard(lang)
+    music_duration = convert_seconds_to_human_readable_form(user_data['music_duration'])
+
+    # TODO: Send back the length of the music
+    update.message.reply_text(
+        f"{translate_key_to(lp.MUSIC_CUTTER_HELP, lang).format(music_duration)}\n",
+        reply_markup=back_button_keyboard
+    )
+
+def throw_not_implemented(update: Update, context: CallbackContext) -> None:
+    lang = context.user_data['language']
+
+    back_button_keyboard = generate_back_button_keyboard(lang)
+
+    update.message.reply_text(
+        translate_key_to(lp.ERR_NOT_IMPLEMENTED, lang),
+        reply_markup=back_button_keyboard
+    )
+
+def handle_music_bitrate_changer(update: Update, context: CallbackContext) -> None:
+    throw_not_implemented(update, context)
+    context.user_data['current_active_module'] = ''
+
+def prepare_for_artist(update: Update, context: CallbackContext) -> None:
+    if len(context.user_data) == 0:
+        message_text = translate_key_to(lp.DEFAULT_MESSAGE, context.user_data['language'])
+    else:
+        context.user_data['tag_editor']['current_tag'] = 'artist'
+        message_text = translate_key_to(lp.ASK_FOR_ARTIST, context.user_data['language'])
+
+    update.message.reply_text(message_text)
+
+def prepare_for_title(update: Update, context: CallbackContext) -> None:
+    if len(context.user_data) == 0:
+        message_text = translate_key_to(lp.DEFAULT_MESSAGE, context.user_data['language'])
+    else:
+        context.user_data['tag_editor']['current_tag'] = 'title'
+        message_text = translate_key_to(lp.ASK_FOR_TITLE, context.user_data['language'])
+
+    update.message.reply_text(message_text)
+
+def prepare_for_album(update: Update, context: CallbackContext) -> None:
+    if len(context.user_data) == 0:
+        message_text = translate_key_to(lp.DEFAULT_MESSAGE, context.user_data['language'])
+    else:
+        context.user_data['tag_editor']['current_tag'] = 'album'
+        message_text = translate_key_to(lp.ASK_FOR_ALBUM, context.user_data['language'])
+
+    update.message.reply_text(message_text)
+
+def prepare_for_genre(update: Update, context: CallbackContext) -> None:
+    if len(context.user_data) == 0:
+        message_text = translate_key_to(lp.DEFAULT_MESSAGE, context.user_data['language'])
+    else:
+        context.user_data['tag_editor']['current_tag'] = 'genre'
+        message_text = translate_key_to(lp.ASK_FOR_GENRE, context.user_data['language'])
+
+    update.message.reply_text(message_text)
+
+def prepare_for_year(update: Update, context: CallbackContext) -> None:
+    if len(context.user_data) == 0:
+        message_text = translate_key_to(lp.DEFAULT_MESSAGE, context.user_data['language'])
+    else:
+        context.user_data['tag_editor']['current_tag'] = 'year'
+        message_text = translate_key_to(lp.ASK_FOR_YEAR, context.user_data['language'])
+
+    update.message.reply_text(message_text)
+
+def prepare_for_disknumber(update: Update, context: CallbackContext) -> None:
+    if len(context.user_data) == 0:
+        message_text = translate_key_to(lp.DEFAULT_MESSAGE, context.user_data['language'])
+    else:
+        context.user_data['tag_editor']['current_tag'] = 'disknumber'
+        message_text = translate_key_to(lp.ASK_FOR_DISK_NUMBER, context.user_data['language'])
+
+    update.message.reply_text(message_text)
+
+def prepare_for_tracknumber(update: Update, context: CallbackContext) -> None:
+    if len(context.user_data) == 0:
+        message_text = translate_key_to(lp.DEFAULT_MESSAGE, context.user_data['language'])
+    else:
+        context.user_data['tag_editor']['current_tag'] = 'tracknumber'
+        message_text = translate_key_to(lp.ASK_FOR_TRACK_NUMBER, context.user_data['language'])
+
+    update.message.reply_text(message_text)
+
+def handle_music_to_voice_converter(update: Update, context: CallbackContext) -> None:
+    message = update.message
+    context.bot.send_chat_action(
+        chat_id=update.message.chat_id,
+        action=ChatAction.RECORD_AUDIO
+    )
+
+    user_data = context.user_data
+    input_music_path = user_data['music_path']
+    voice_path = f"{user_data['music_path']}.ogg"
+    lang = user_data['language']
+    user_data['current_active_module'] = 'mp3_to_voice_converter'  # TODO: Make modules a dict
+
+    os.system(
+        f"ffmpeg -i -y {input_music_path} -ac 1 -map 0:a -codec:a opus -b:a 128k -vbr off \
+         {input_music_path}"
+    )
+    os.system(f"ffmpeg -i {input_music_path} -c:a libvorbis -q:a 4 {voice_path}")
+
+    start_over_button_keyboard = generate_start_over_keyboard(lang)
+
+    context.bot.send_chat_action(
+        chat_id=update.message.chat_id,
+        action=ChatAction.UPLOAD_AUDIO
+    )
+
+    try:
+        with open(voice_path, 'rb') as voice_file:
+            context.bot.send_voice(
+                voice=voice_file,
+                duration=user_data['music_duration'],
+                chat_id=message.chat_id,
+                caption=f"🆔 {BOT_USERNAME}",
+                reply_markup=start_over_button_keyboard,
+                reply_to_message_id=user_data['music_message_id']
+            )
+    except TelegramError as error:
+        message.reply_text(
+            translate_key_to(lp.ERR_ON_UPLOADING, lang),
+            reply_markup=start_over_button_keyboard
+        )
+        logger.exception("Telegram error: %s", error)
+
+    delete_file(voice_path)
+
+    reset_user_data_context(context)
 
 def prepare_for_album_art(update: Update, context: CallbackContext) -> None:
     if len(context.user_data) == 0:
@@ -1251,65 +1312,123 @@ def display_preview(update: Update, context: CallbackContext) -> None:
 def main():
     defaults = Defaults(parse_mode=ParseMode.MARKDOWN, timeout=120)
     persistence = PicklePersistence('persistence_storage')
-    ##########
+
     updater = Updater(BOT_TOKEN, persistence=persistence, defaults=defaults)
     add_handler = updater.dispatcher.add_handler
-    ##########
+
+    ##########################
+    # Users Command Handlers #
+    ##########################
     add_handler(CommandHandler('start', command_start))
     add_handler(CommandHandler('new', start_over))
     add_handler(CommandHandler('language', show_language_keyboard))
     add_handler(CommandHandler('help', command_help))
     add_handler(CommandHandler('about', command_about))
-    ##########
-    # add_handler(CommandHandler('vdone', finish_convert_video))
-    # add_handler(CommandHandler('vpreview', display_preview_video))
-    # ##########
-    # ##########
-    # add_handler(CommandHandler('vadone', finish_convert_voice_to_audio))
-    # add_handler(CommandHandler('vapreview', display_preview_video))
-    ##########
+
+    #################
+    # File Handlers #
+    #################
+    add_handler(MessageHandler(Filters.audio, handle_music_message))
+    add_handler(MessageHandler(Filters.photo, handle_photo_message))
+    add_handler(MessageHandler(Filters.video, handle_video_message))
+    add_handler(MessageHandler(Filters.voice, handle_voice_message))
+    add_handler(MessageHandler(Filters.entity("url"), handle_download_message))
+
+    ############################
+    # Change Language Handlers #
+    ############################
+    add_handler(MessageHandler(Filters.regex('^(🇬🇧 English)$'), set_language))
+    add_handler(MessageHandler(Filters.regex('^(🇮🇷 فارسی)$'), set_language))
+
+    ############################
+    # Module Selector Handlers #
+    ############################
+    add_handler(MessageHandler(
+        (Filters.regex('^(🔙 Back)$') | Filters.regex('^(🔙 بازگشت)$')),
+        show_module_selector)
+    )
     add_handler(MessageHandler(
         (Filters.regex('^(🆕 New File or Link)$') | Filters.regex('^(🆕 فایل یا لینک جدید)$')),
         start_over)
     )
     add_handler(MessageHandler(
+        (Filters.regex('^(🗣 Music to Voice Converter)$') | Filters.regex('^(🗣 تبدیل به پیام صوتی)$')),
+        handle_music_to_voice_converter)
+    )
+    add_handler(MessageHandler(
+        (Filters.regex('^(✂️ Music Cutter)$') | Filters.regex('^(✂️ بریدن آهنگ)$')),
+        handle_music_cutter)
+    )
+    add_handler(MessageHandler(
+        (Filters.regex('^(🎙 Bitrate Changer)$') | Filters.regex('^(🎙 تغییر بیت ریت)$')),
+        handle_music_bitrate_changer)
+    )
+    #######################
+    # Tag Editor Handlers #
+    #######################
+    add_handler(MessageHandler(
         (Filters.regex('^(🎵 Tag Editor)$') | Filters.regex('^(🎵 تغییر تگ ها)$')),
         handle_music_tag_editor)
     )
-    ##########
+    add_handler(MessageHandler(
+        (Filters.regex('^(🗣 Artist)$') | Filters.regex('^(🗣 خواننده)$')),
+        prepare_for_artist)
+    )
+    add_handler(MessageHandler(
+        (Filters.regex('^(🎵 Title)$') | Filters.regex('^(🎵 عنوان)$')),
+        prepare_for_title)
+    )
+    add_handler(MessageHandler(
+        (Filters.regex('^(🎼 Album)$') | Filters.regex('^(🎼 آلبوم)$')),
+        prepare_for_album)
+    )
+    add_handler(MessageHandler(
+        (Filters.regex('^(🎹 Genre)$') | Filters.regex('^(🎹 ژانر)$')),
+        prepare_for_genre)
+    )
+    add_handler(MessageHandler(
+        (Filters.regex('^(🖼 Album Art)$') | Filters.regex('^(🖼 عکس آلبوم)$')),
+        prepare_for_album_art)
+    )
+    add_handler(MessageHandler(
+        (Filters.regex('^(📅 Year)$') | Filters.regex('^(📅 سال)$')),
+        prepare_for_year)
+    )
+    add_handler(MessageHandler(
+        (Filters.regex('^(💿 Disk Number)$') | Filters.regex('^(💿  شماره دیسک)$')),
+        prepare_for_disknumber)
+    )
+    add_handler(MessageHandler(
+        (Filters.regex('^(▶️ Track Number)$') | Filters.regex('^(▶️ شماره ترک)$')),
+        prepare_for_tracknumber)
+    )
+    #######################
+    # Convert video #
+    #######################
     add_handler(MessageHandler(
         (Filters.regex('^(🎥 convert to circular video)$') | Filters.regex('^(🎥 تبدیل به ویدیو دایره‌ای)$')),
         handle_convert_video_message)
     )
-    ##########
     add_handler(MessageHandler(
         Filters.regex('^(📷 convert video to gif)$') | Filters.regex('^(📷 تبدیل ویدیو به گیف)$'),
         handle_convert_video_to_gif_message)
     )
+    #######################
+    # Convert Audio #
+    #######################
     add_handler(MessageHandler(
         (Filters.regex('^(🔊 convert voice to audio)$') | Filters.regex('^(🔊 تبدیل صدا به موزیک)$')),
         handle_convert_voice_message)
     )
     ##########
     add_handler(CommandHandler('done', finish))
-    # add_handler(CommandHandler('done', finish_editing_tags))
     add_handler(CommandHandler('preview', display_preview))
     ##########
     add_handler(MessageHandler(
         (Filters.regex('^(🖼 Album Art)$') | Filters.regex('^(🖼 عکس آلبوم)$')),
         prepare_for_album_art)
     )
-    ##########
-    add_handler(MessageHandler(Filters.audio, handle_music_message))
-    add_handler(MessageHandler(Filters.photo, handle_photo_message))
-    add_handler(MessageHandler(Filters.video, handle_video_message))
-    add_handler(MessageHandler(Filters.voice, handle_voice_message))
-    add_handler(MessageHandler(Filters.entity("url"), handle_download_message))
-    # add_handler(MessageHandler(Filters.text, handle_download_message))
-    ##########
-    add_handler(MessageHandler(Filters.regex('^(🇬🇧 English)$'), set_language))
-    add_handler(MessageHandler(Filters.regex('^(🇮🇷 فارسی)$'), set_language))
-    ##########
+
     updater.start_polling()
     updater.idle()
 
