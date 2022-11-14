@@ -477,15 +477,34 @@ def ffmpegcommand(voice, mime_type):
     # print(cmd)
     return cmd
 
-def myffmpegcommand(voice_path, user_data):
-    voice = voice_path.split(".")[0]
+def myffmpegcommand(user_data):
+    input_voice_path = user_data['voice_path']
+    input_voice_path = input_voice_path.split(".")[0]
     new_mime_type = ".mp3"
-    new_voice = voice + new_mime_type
+    music_path = input_voice_path + new_mime_type
+
+    # music_path = f"{user_data['voice_path']}.mp3"
+    # user_data['current_active_module'] = 'mp3_to_voice_converter'  # TODO: Make modules a dict
+
+    os.system(
+        f"ffmpeg -i -y {input_voice_path} -ac 1 -map 0:a -codec:a opus -b:a 128k -vbr off \
+         {input_voice_path}"
+    )
+    os.system(f"ffmpeg -i {input_voice_path} -c:a libvorbis -q:a 4 {music_path}")
+
+    logging.error(input_voice_path)
+    logging.error(music_path)
+
+    # new_voice_path = user_data['new_voice_art_path']
+
+    # voice = voice_path.split(".")[0]
+    # new_mime_type = ".mp3"
+    # new_voice = voice + new_mime_type
     # subprocess.run(["ffmpeg", '-i', voice_path, '-acodec', 'libopus', new_voice, '-y'])
     # subprocess.run(["ffmpeg -i {voice_path} -map 0:a -acodec libmp3lame {new_voice}"])
     
-    subprocess.run(["ffmpeg", "-n", "-i", voice_path, "-acodec", "libmp3lame", "-ab", "128k", new_voice])
-    user_data['new_voice_art_path'] = new_voice
+    # subprocess.run(["ffmpeg", "-n", "-i", voice_path, "-acodec", "libmp3lame", "-ab", "128k", new_voice])
+    # user_data['new_voice_art_path'] = new_voice
     # delete_file(user_data['voice_path'])
     # logging.info(user_data['new_voice_art_path'])
     # return

@@ -571,53 +571,104 @@ def handle_convert_video_to_gif_message(update: Update, context: CallbackContext
 
 def handle_convert_voice_message(update: Update, context: CallbackContext) -> None:
     message = update.message
-    user_id = update.effective_user.id
+    context.bot.send_chat_action(
+        chat_id=update.message.chat_id,
+        action=ChatAction.UPLOAD_AUDIO
+    )
+
     user_data = context.user_data
-    voice_path = user_data['voice_path']
+    input_voice_path = user_data['voice_path']
+    music_path = f"{user_data['voice_path']}.mp3"
     lang = user_data['language']
+    user_data['current_active_module'] = 'mp3_to_voice_converter'  # TODO: Make modules a dict
 
-    user_data['current_active_module'] = 'tag_editor'
+    logging.error(input_voice_path)
+    logging.error(music_path)
 
-    tag_editor_context = user_data['tag_editor']
-    tag_editor_context['current_tag'] = ''
+    os.system(f"ffmpeg -i {input_voice_path} -map_metadata 0:s:0 {music_path}")
+    # os.system(["ffmpeg", "-n", "-i", input_voice_path, "-acodec", "libmp3lame", "-ab", "128k", music_path])
 
-    tag_editor_keyboard = generate_module_selector_voice_keyboard(lang)
+    # os.system(
+    #     f"ffmpeg -i -y {input_voice_path} -ac 1 -map 0:a -codec:a opus -b:a 128k -vbr off \
+    #      {input_voice_path}"
+    # )
+    # os.system(f"ffmpeg -i {input_voice_path} -c:a libvorbis -q:a 4 {music_path}")
 
-    if voice_path:
-        # with open(video_path, 'rb') as video_file:
-        #     message.reply_video_note(
-        #         video_note=video_file,
-        #         reply_to_message_id=update.effective_message.message_id,
-        #         reply_markup=tag_editor_keyboard,
-        #     )
-        try:
-            # file_download_path = download_file(
-            #     user_id=user_id,
-            #     file_to_download=message.photo[len(message.photo) - 1],
-            #     file_type='photo',
-            #     context=context
-            # )
-            reply_message = f"{translate_key_to(lp.ALBUM_ART_CHANGED, lang)} " \
-                            f"{translate_key_to(lp.CLICK_PREVIEW_MESSAGE, lang)} " \
-                            f"{translate_key_to(lp.OR, lang).upper()} " \
-                            f"{translate_key_to(lp.CLICK_DONE_MESSAGE, lang).lower()}"
-            user_data['voice_path'] = voice_path
-            user_data['convert_audio_to_voice'] = True
-            message.reply_text(reply_message, reply_markup=tag_editor_keyboard)
-        except (ValueError, BaseException):
-            message.reply_text(translate_key_to(lp.ERR_ON_DOWNLOAD_AUDIO_MESSAGE, lang))
-            logger.error(
-                "Error on downloading %s's file. File type: Photo",
-                user_id,
-                exc_info=True
+    # os.system(f"ffmpeg -i {input_voice_path} -c:a aac libmp3lame -q:a 4 {music_path}")
+    # voice_path = user_data['voice_path']
+
+    # myffmpegcommand(voice_path, user_data)
+
+    # lang = user_data['language']
+
+    new_voice_path = user_data['new_voice_art_path']
+
+    start_over_button_keyboard = generate_start_over_keyboard(lang)
+
+    try:
+        with open(new_voice_path, 'rb') as voice:
+            message.reply_voice(
+                voice=voice,
+                reply_to_message_id=update.effective_message.message_id,
+                reply_markup=start_over_button_keyboard,
             )
-            return
-    else:
+    except (TelegramError, BaseException) as error:
         message.reply_text(
-            generate_music_info(tag_editor_context).format(f"\n🆔 {BOT_USERNAME}"),
-            reply_to_message_id=update.effective_message.message_id,
-            reply_markup=tag_editor_keyboard
+            translate_key_to(lp.ERR_ON_UPLOADING, lang),
+            reply_markup=start_over_button_keyboard
         )
+        logger.exception("Telegram error: %s", error)
+
+    reset_user_data_context(context)
+
+    # message = update.message
+    # user_id = update.effective_user.id
+    # user_data = context.user_data
+    # voice_path = user_data['voice_path']
+    # lang = user_data['language']
+
+    # user_data['current_active_module'] = 'tag_editor'
+
+    # tag_editor_context = user_data['tag_editor']
+    # tag_editor_context['current_tag'] = ''
+
+    # tag_editor_keyboard = generate_module_selector_voice_keyboard(lang)
+
+    # if voice_path:
+    #     # with open(video_path, 'rb') as video_file:
+    #     #     message.reply_video_note(
+    #     #         video_note=video_file,
+    #     #         reply_to_message_id=update.effective_message.message_id,
+    #     #         reply_markup=tag_editor_keyboard,
+    #     #     )
+    #     try:
+    #         # file_download_path = download_file(
+    #         #     user_id=user_id,
+    #         #     file_to_download=message.photo[len(message.photo) - 1],
+    #         #     file_type='photo',
+    #         #     context=context
+    #         # )
+    #         reply_message = f"{translate_key_to(lp.ALBUM_ART_CHANGED, lang)} " \
+    #                         f"{translate_key_to(lp.CLICK_PREVIEW_MESSAGE, lang)} " \
+    #                         f"{translate_key_to(lp.OR, lang).upper()} " \
+    #                         f"{translate_key_to(lp.CLICK_DONE_MESSAGE, lang).lower()}"
+    #         user_data['voice_path'] = voice_path
+    #         user_data['convert_audio_to_voice'] = True
+    #         message.reply_text(reply_message, reply_markup=tag_editor_keyboard)
+    #     except (ValueError, BaseException):
+    #         message.reply_text(translate_key_to(lp.ERR_ON_DOWNLOAD_AUDIO_MESSAGE, lang))
+    #         logger.error(
+    #             "Error on downloading %s's file. File type: Photo",
+    #             user_id,
+    #             exc_info=True
+    #         )
+    #         return
+    # else:
+    #     message.reply_text(
+    #         generate_music_info(tag_editor_context).format(f"\n🆔 {BOT_USERNAME}"),
+    #         reply_to_message_id=update.effective_message.message_id,
+    #         reply_markup=tag_editor_keyboard
+    #     )
 
 def show_module_selector(update: Update, context: CallbackContext) -> None:
     user_data = context.user_data
@@ -852,18 +903,28 @@ def prepare_for_album_art(update: Update, context: CallbackContext) -> None:
 
 def finish_convert_voice_to_audio(update: Update, context: CallbackContext) -> None:
     message = update.message
-    user_data = context.user_data
-
     context.bot.send_chat_action(
         chat_id=update.message.chat_id,
         action=ChatAction.UPLOAD_AUDIO
     )
 
-    voice_path = user_data['voice_path']
-
-    myffmpegcommand(voice_path, user_data)
-
+    user_data = context.user_data
+    input_voice_path = user_data['voice_path']
+    music_path = f"{user_data['voice_path']}.mp3"
     lang = user_data['language']
+    user_data['current_active_module'] = 'mp3_to_voice_converter'  # TODO: Make modules a dict
+
+    os.system(
+        f"ffmpeg -i -y {input_voice_path} -ac 1 -map 0:a -codec:a opus -b:a 128k -vbr off \
+         {input_voice_path}"
+    )
+    os.system(f"ffmpeg -i {input_voice_path} -c:a libvorbis -q:a 4 {music_path}")
+
+    # voice_path = user_data['voice_path']
+
+    # myffmpegcommand(voice_path, user_data)
+
+    # lang = user_data['language']
 
     new_voice_path = user_data['new_voice_art_path']
 
@@ -1004,8 +1065,8 @@ def finish(update: Update, context: CallbackContext) -> None:
             chat_id=update.message.chat_id,
             action=ChatAction.UPLOAD_AUDIO
         )
-        voice_path = user_data['voice_path']
-        myffmpegcommand(voice_path, user_data)
+        # voice_path = user_data['voice_path']
+        myffmpegcommand(user_data)
         lang = user_data['language']
         new_voice_path = user_data['new_voice_art_path']
         try:
