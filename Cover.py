@@ -17,7 +17,7 @@ from utils import translate_key_to, reset_user_data_context, generate_start_over
 create_user_directory, download_file, generate_back_button_keyboard, increment_usage_counter_for_user, delete_file, \
 generate_module_selector_keyboard, generate_module_selector_video_keyboard, generate_tag_editor_keyboard, \
 generate_music_info, generate_tag_editor_video_keyboard, generate_module_selector_voice_keyboard, save_tags_to_file, \
-ffmpegcommand, myffmpegcommand, video_to_gif
+ffmpegcommand, myffmpegcommand, video_to_gif, generate_module_setting_keyboard
 
 from models.user import User
 from dbConfig import db
@@ -68,6 +68,15 @@ def command_help(update: Update, context: CallbackContext) -> None:
 
 def command_about(update: Update, context: CallbackContext) -> None:
     update.message.reply_text(translate_key_to(lp.ABOUT_MESSAGE, context.user_data['language']))
+
+def command_setting(update: Update, context: CallbackContext) -> None:
+    user_data = context.user_data
+    language = user_data['language']
+
+    update.message.reply_text(
+        translate_key_to(lp.START_OVER_MESSAGE, language),
+        reply_markup=generate_module_setting_keyboard(language)
+    )
 
 def show_language_keyboard(update: Update, _context: CallbackContext) -> None:
     language_button_keyboard = ReplyKeyboardMarkup(
@@ -580,10 +589,10 @@ def handle_convert_voice_message(update: Update, context: CallbackContext) -> No
     input_voice_path = user_data['voice_path']
     music_path = f"{user_data['voice_path']}.mp3"
     lang = user_data['language']
-    user_data['current_active_module'] = 'mp3_to_voice_converter'  # TODO: Make modules a dict
+    # user_data['current_active_module'] = 'mp3_to_voice_converter'  # TODO: Make modules a dict
 
-    logging.error(input_voice_path)
-    logging.error(music_path)
+    # logging.error(input_voice_path)
+    # logging.error(music_path)
 
     os.system(f"ffmpeg -i {input_voice_path} -map_metadata 0:s:0 {music_path}")
     # os.system(["ffmpeg", "-n", "-i", input_voice_path, "-acodec", "libmp3lame", "-ab", "128k", music_path])
@@ -601,25 +610,53 @@ def handle_convert_voice_message(update: Update, context: CallbackContext) -> No
 
     # lang = user_data['language']
 
-    new_voice_path = user_data['new_voice_art_path']
-
     start_over_button_keyboard = generate_start_over_keyboard(lang)
 
+    context.bot.send_chat_action(
+        chat_id=update.message.chat_id,
+        action=ChatAction.UPLOAD_AUDIO
+    )
+
     try:
-        with open(new_voice_path, 'rb') as voice:
-            message.reply_voice(
-                voice=voice,
-                reply_to_message_id=update.effective_message.message_id,
+        with open(music_path, 'rb') as music_file:
+            context.bot.send_audio(
+                audio=music_file,
+                duration=user_data['music_duration'],
+                chat_id=message.chat_id,
+                caption=f"🆔 {BOT_USERNAME}",
                 reply_markup=start_over_button_keyboard,
+                reply_to_message_id=user_data['music_message_id']
             )
-    except (TelegramError, BaseException) as error:
+    except TelegramError as error:
         message.reply_text(
             translate_key_to(lp.ERR_ON_UPLOADING, lang),
             reply_markup=start_over_button_keyboard
         )
         logger.exception("Telegram error: %s", error)
 
+    delete_file(music_path)
+
     reset_user_data_context(context)
+
+    # new_voice_path = user_data['new_voice_art_path']
+
+    # start_over_button_keyboard = generate_start_over_keyboard(lang)
+
+    # try:
+    #     with open(new_voice_path, 'rb') as voice:
+    #         message.reply_voice(
+    #             voice=voice,
+    #             reply_to_message_id=update.effective_message.message_id,
+    #             reply_markup=start_over_button_keyboard,
+    #         )
+    # except (TelegramError, BaseException) as error:
+    #     message.reply_text(
+    #         translate_key_to(lp.ERR_ON_UPLOADING, lang),
+    #         reply_markup=start_over_button_keyboard
+    #     )
+    #     logger.exception("Telegram error: %s", error)
+
+    # reset_user_data_context(context)
 
     # message = update.message
     # user_id = update.effective_user.id
@@ -1385,6 +1422,7 @@ def main():
     add_handler(CommandHandler('language', show_language_keyboard))
     add_handler(CommandHandler('help', command_help))
     add_handler(CommandHandler('about', command_about))
+    add_handler(CommandHandler('setting', command_setting))
 
     #################
     # File Handlers #

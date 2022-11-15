@@ -54,6 +54,9 @@ BTN_TRACK_NUMBER = "BTN_TRACK_NUMBER"
 BTN_BACK = "BTN_BACK"
 BTN_ALBUM = "BTN_ALBUM"
 BTN_NEW_FILE = "BTN_NEW_FILE"
+BTN_PROFILE = "BTN_PROFILE"
+BTN_BUY_COIN = "BTN_BUY_COIN"
+BTN_DISPLAY_NUMBER_SENT_FILES = "BTN_DISPLAY_NUMBER_SENT_FILES"
 MUSIC_CUTTER_HELP = "MUSIC_CUTTER_HELP"
 DONE = "DONE"
 OR = "OR"
@@ -307,6 +310,18 @@ keys = {
     BTN_NEW_FILE: {
         "en": "🆕 New File or Link",
         "fa": "🆕 فایل یا لینک جدید",
+    },
+    BTN_PROFILE: {
+        "en": "🆕 View profile",
+        "fa": "🆕 نمایش پروفایل",
+    },
+    BTN_BUY_COIN: {
+        "en": "🆕 Buy coins",
+        "fa": "🆕 خرید سکه",
+    },
+    BTN_DISPLAY_NUMBER_SENT_FILES : {
+        "en": "🆕 Display the number of sent files",
+        "fa": "🆕 نمایش تعداد فایل های ارسال شده",
     },
     MUSIC_CUTTER_HELP: {
         "en": "\n\nNow send me which part of the music you want to cut out?\n"

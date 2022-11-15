@@ -297,6 +297,31 @@ def generate_module_selector_keyboard(language: str) -> ReplyKeyboardMarkup:
         )
     )
 
+def generate_module_setting_keyboard(language: str) -> ReplyKeyboardMarkup:
+    """Create an return an instance of `module_selector_keyboard`
+
+    **Keyword arguments:**
+     - language (str) -- The desired language to generate labels
+
+    **Returns:**
+     ReplyKeyboardMarkup instance
+    """
+    return (
+        ReplyKeyboardMarkup(
+            [
+                [
+                    translate_key_to('BTN_PROFILE', language),
+                    translate_key_to('BTN_BUY_COIN', language)
+                ],
+                [
+                    translate_key_to('BTN_DISPLAY_NUMBER_SENT_FILES', language),
+                ]
+            ],
+            resize_keyboard=True,
+            one_time_keyboard=True,
+        )
+    )
+
 def generate_module_selector_video_keyboard(language: str) -> ReplyKeyboardMarkup:
     """Create an return an instance of `module_selector_video_keyboard`
 
