@@ -60,7 +60,11 @@ BTN_DISPLAY_NUMBER_SENT_FILES = "BTN_DISPLAY_NUMBER_SENT_FILES"
 MUSIC_CUTTER_HELP = "MUSIC_CUTTER_HELP"
 DONE = "DONE"
 OR = "OR"
-
+FIRST_NAME = "FIRST_NAME"
+LAST_NAME = "LAST_NAME"
+USER_NAME = "USER_NAME"
+NUMBER_OF_COINS = "NUMBER_OF_COINS"
+NUMBER_OF_FILE_SENT = "NUMBER_OF_FILE_SENT"
 REPORT_BUG_MESSAGE_EN = "That's my fault! Please send a bug report here: @jojo"
 REPORT_BUG_MESSAGE_FA = "این اشتباه منه! لطفا این باگ رو از اینجا گزارش کنید: @jojo"
 EG_EN = "e.g."
@@ -319,10 +323,6 @@ keys = {
         "en": "🆕 Buy coins",
         "fa": "🆕 خرید سکه",
     },
-    BTN_DISPLAY_NUMBER_SENT_FILES : {
-        "en": "🆕 Display the number of sent files",
-        "fa": "🆕 نمایش تعداد فایل های ارسال شده",
-    },
     MUSIC_CUTTER_HELP: {
         "en": "\n\nNow send me which part of the music you want to cut out?\n"
               "The file length is {}.\n\n"
@@ -351,4 +351,24 @@ keys = {
         "en": "or",
         "fa": "یا",
     },
+    FIRST_NAME: {
+        "en": "First Name: \n",
+        "fa": "نام: \n",
+    },
+    LAST_NAME: {
+        "en": "Last Name: \n",
+        "fa":  "نام خانوادگی: \n",
+    },
+    USER_NAME: {
+        "en": "User Name: \n",
+        "fa":  "نام کاربری: \n",
+    },
+    NUMBER_OF_COINS: {
+        "en": "ٔNumber of coins: \n",
+        "fa":  "تعداد سکه ها: \n",
+    },
+    NUMBER_OF_FILE_SENT: {
+        "en": "ٔNumber of file sent: \n",
+        "fa":  "تعداد فایل های ارسال شده: \n",
+    }
 }

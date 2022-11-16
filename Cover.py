@@ -1406,6 +1406,26 @@ def display_preview(update: Update, context: CallbackContext) -> None:
             f"🆔 {BOT_USERNAME}",
             reply_to_message_id=update.effective_message.message_id,
         )
+def show_profile(update: Update, context: CallbackContext) -> None:
+    user_data = context.user_data
+    user_id = update.effective_user.id
+    message = update.message
+    lang = user_data['language']
+
+    user = User.where('user_id', '=', user_id).first()
+    username = user.username
+    number_of_files_sent = user.number_of_files_sent
+
+    logging.error(username)
+    logging.error(number_of_files_sent)
+
+    start_over_button_keyboard = generate_start_over_keyboard(lang)
+    reply_message = f"{translate_key_to(lp.FIRST_NAME, lang)} " \
+                    f"{translate_key_to(lp.LAST_NAME, lang)} " \
+                    f"{translate_key_to(lp.USER_NAME, lang)} " \
+                    f"{translate_key_to(lp.NUMBER_OF_COINS, lang).upper()} " \
+                    f"{translate_key_to(lp.NUMBER_OF_FILE_SENT, lang).lower()} "
+    message.reply_text(reply_message, reply_markup=start_over_button_keyboard)
 
 def main():
     defaults = Defaults(parse_mode=ParseMode.MARKDOWN, timeout=120)
@@ -1439,6 +1459,10 @@ def main():
     add_handler(MessageHandler(Filters.regex('^(🇬🇧 English)$'), set_language))
     add_handler(MessageHandler(Filters.regex('^(🇮🇷 فارسی)$'), set_language))
 
+    add_handler(MessageHandler(
+        (Filters.regex('^(🆕 View profile)$') | Filters.regex('^(🆕 نمایش پروفایل)$')),
+        show_profile)
+    )
     ############################
     # Module Selector Handlers #
     ############################

@@ -313,9 +313,6 @@ def generate_module_setting_keyboard(language: str) -> ReplyKeyboardMarkup:
                     translate_key_to('BTN_PROFILE', language),
                     translate_key_to('BTN_BUY_COIN', language)
                 ],
-                [
-                    translate_key_to('BTN_DISPLAY_NUMBER_SENT_FILES', language),
-                ]
             ],
             resize_keyboard=True,
             one_time_keyboard=True,
