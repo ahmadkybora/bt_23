@@ -1406,6 +1406,7 @@ def display_preview(update: Update, context: CallbackContext) -> None:
             f"🆔 {BOT_USERNAME}",
             reply_to_message_id=update.effective_message.message_id,
         )
+        
 def show_profile(update: Update, context: CallbackContext) -> None:
     user_data = context.user_data
     user_id = update.effective_user.id
@@ -1415,16 +1416,28 @@ def show_profile(update: Update, context: CallbackContext) -> None:
     user = User.where('user_id', '=', user_id).first()
     username = user.username
     number_of_files_sent = user.number_of_files_sent
-
-    logging.error(username)
-    logging.error(number_of_files_sent)
+    coin = user.coin
 
     start_over_button_keyboard = generate_start_over_keyboard(lang)
-    reply_message = f"{translate_key_to(lp.FIRST_NAME, lang)} " \
-                    f"{translate_key_to(lp.LAST_NAME, lang)} " \
-                    f"{translate_key_to(lp.USER_NAME, lang)} " \
-                    f"{translate_key_to(lp.NUMBER_OF_COINS, lang).upper()} " \
-                    f"{translate_key_to(lp.NUMBER_OF_FILE_SENT, lang).lower()} "
+    reply_message = f"{translate_key_to(lp.USER_NAME, lang)} {username} \n" \
+                    f"{translate_key_to(lp.NUMBER_OF_COINS, lang).upper()} {coin} \n" \
+                    f"{translate_key_to(lp.NUMBER_OF_FILE_SENT, lang).lower()} {number_of_files_sent} \n \n"
+    message.reply_text(reply_message, reply_markup=start_over_button_keyboard)
+
+def by_coins(update: Update, context: CallbackContext) -> None:
+    user_data = context.user_data
+    user_id = update.effective_user.id
+    message = update.message
+    lang = user_data['language']
+
+    coins_20 = "15,000"
+    coins_50 = "35,000"
+    coins_100 = "80,000"
+
+    start_over_button_keyboard = generate_start_over_keyboard(lang)
+    reply_message = f"{translate_key_to(lp.COINS_20, lang)} {coins_20} \n"\
+                    f"{translate_key_to(lp.COINS_50, lang).upper()} {coins_50} \n" \
+                    f"{translate_key_to(lp.COINS_100, lang).lower()} {coins_100} \n"
     message.reply_text(reply_message, reply_markup=start_over_button_keyboard)
 
 def main():
@@ -1462,6 +1475,11 @@ def main():
     add_handler(MessageHandler(
         (Filters.regex('^(🆕 View profile)$') | Filters.regex('^(🆕 نمایش پروفایل)$')),
         show_profile)
+    )
+
+    add_handler(MessageHandler(
+        (Filters.regex('^(🆕 Buy coins)$') | Filters.regex('^(🆕 خرید سکه)$')),
+        by_coins)
     )
     ############################
     # Module Selector Handlers #

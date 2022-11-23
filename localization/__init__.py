@@ -65,6 +65,9 @@ LAST_NAME = "LAST_NAME"
 USER_NAME = "USER_NAME"
 NUMBER_OF_COINS = "NUMBER_OF_COINS"
 NUMBER_OF_FILE_SENT = "NUMBER_OF_FILE_SENT"
+COINS_20 = "COINS_20"
+COINS_50 = "COINS_50"
+COINS_100 = "COINS_100"
 REPORT_BUG_MESSAGE_EN = "That's my fault! Please send a bug report here: @jojo"
 REPORT_BUG_MESSAGE_FA = "این اشتباه منه! لطفا این باگ رو از اینجا گزارش کنید: @jojo"
 EG_EN = "e.g."
@@ -352,23 +355,35 @@ keys = {
         "fa": "یا",
     },
     FIRST_NAME: {
-        "en": "First Name: \n",
-        "fa": "نام: \n",
+        "en": "First Name: ",
+        "fa": "نام: ",
     },
     LAST_NAME: {
-        "en": "Last Name: \n",
-        "fa":  "نام خانوادگی: \n",
+        "en": "Last Name: ",
+        "fa": "نام خانوادگی: ",
     },
     USER_NAME: {
-        "en": "User Name: \n",
-        "fa":  "نام کاربری: \n",
+        "en": "User Name: ",
+        "fa": "نام کاربری: ",
     },
     NUMBER_OF_COINS: {
-        "en": "ٔNumber of coins: \n",
-        "fa":  "تعداد سکه ها: \n",
+        "en": "Number of coins: ",
+        "fa": "تعداد سکه ها: ",
+    },
+    COINS_20: {
+        "en": "20 coin: ",
+        "fa": "20 سکه: ",
+    },
+    COINS_50: {
+        "en": "50 coin: ",
+        "fa": "50 سکه: ",
+    },
+    COINS_100: {
+        "en": "100 coin: ",
+        "fa": "100 سکه: ",
     },
     NUMBER_OF_FILE_SENT: {
-        "en": "ٔNumber of file sent: \n",
-        "fa":  "تعداد فایل های ارسال شده: \n",
+        "en": "Number of file sent: ",
+        "fa":  "تعداد فایل های ارسال شده: ",
     }
 }
