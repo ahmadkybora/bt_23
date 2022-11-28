@@ -398,6 +398,26 @@ def generate_tag_editor_keyboard(language: str) -> ReplyKeyboardMarkup:
             resize_keyboard=True,
         )
     )
+def generate_module_coin_pay(language: str) -> ReplyKeyboardMarkup:
+        return (
+        ReplyKeyboardMarkup(
+            [
+                [
+                    translate_key_to('COINS_20_BUY', language),
+                ],
+                [
+                    translate_key_to('COINS_50_BUY', language),
+                ],
+                [
+                    translate_key_to('COINS_100_BUY', language)
+                ],
+                [
+                    translate_key_to('BTN_BACK', language)
+                ]
+            ],
+            resize_keyboard=True,
+        )
+    )
 
 def generate_tag_editor_video_keyboard(language: str) -> ReplyKeyboardMarkup:
     """Create an return an instance of `tag_editor_keyboard`

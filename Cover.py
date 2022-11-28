@@ -17,7 +17,7 @@ from utils import translate_key_to, reset_user_data_context, generate_start_over
 create_user_directory, download_file, generate_back_button_keyboard, increment_usage_counter_for_user, delete_file, \
 generate_module_selector_keyboard, generate_module_selector_video_keyboard, generate_tag_editor_keyboard, \
 generate_music_info, generate_tag_editor_video_keyboard, generate_module_selector_voice_keyboard, save_tags_to_file, \
-ffmpegcommand, myffmpegcommand, video_to_gif, generate_module_setting_keyboard
+ffmpegcommand, myffmpegcommand, video_to_gif, generate_module_setting_keyboard, generate_module_coin_pay
 
 from models.user import User
 from dbConfig import db
@@ -1433,12 +1433,15 @@ def by_coins(update: Update, context: CallbackContext) -> None:
     coins_20 = "15,000"
     coins_50 = "35,000"
     coins_100 = "80,000"
-
-    start_over_button_keyboard = generate_start_over_keyboard(lang)
+    start_pay_coin = generate_module_coin_pay(lang)
+    # start_over_button_keyboard = generate_start_over_keyboard(lang)
     reply_message = f"{translate_key_to(lp.COINS_20, lang)} {coins_20} \n"\
                     f"{translate_key_to(lp.COINS_50, lang).upper()} {coins_50} \n" \
                     f"{translate_key_to(lp.COINS_100, lang).lower()} {coins_100} \n"
-    message.reply_text(reply_message, reply_markup=start_over_button_keyboard)
+    message.reply_text(
+        reply_message, 
+        reply_markup=start_pay_coin
+        )
 
 def main():
     defaults = Defaults(parse_mode=ParseMode.MARKDOWN, timeout=120)

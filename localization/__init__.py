@@ -68,6 +68,9 @@ NUMBER_OF_FILE_SENT = "NUMBER_OF_FILE_SENT"
 COINS_20 = "COINS_20"
 COINS_50 = "COINS_50"
 COINS_100 = "COINS_100"
+COINS_20_BUY = "COINS_20_BUY"
+COINS_50_BUY = "COINS_50_BUY"
+COINS_100_BUY = "COINS_100_BUY"
 REPORT_BUG_MESSAGE_EN = "That's my fault! Please send a bug report here: @jojo"
 REPORT_BUG_MESSAGE_FA = "این اشتباه منه! لطفا این باگ رو از اینجا گزارش کنید: @jojo"
 EG_EN = "e.g."
@@ -84,12 +87,9 @@ keys = {
               "🏞 delete and change the song cover \n"
               "🎥 convert video to circular video \n"
               "📷 convert video to gif \n"
-              "🔊 Convert voice to song \n\n"
-
+              "🔊 Convert voice to song \n"
               "📝 change the caption and remove ads \n"
-              "⏪ Send post and file without name to channel \n\n"
-
-              "[NEW!] \n"
+              "⏪ Send post and file without name to channel \n"
               "🎵 find songs by voice \n"
               "📥 Download the song through the download link \n"
               "📥 Download video via Instagram link \n\n\n"
@@ -105,12 +105,9 @@ keys = {
               "🏞 حذف و تغییر کاور آهنگ \n"
               "🎥 تبدیل ویدیو به ویدیو دایره‌ای \n"
               "📷 تبدیل ویدیو به گیف \n"
-              "🔊 تبدیل وویس به آهنگ \n\n"
-
+              "🔊 تبدیل وویس به آهنگ \n"
               "📝 تغییر کپشن و حذف تبلیغات \n"
-              "⏪ ارسال پست و فایل بدون نام به کانال \n\n"
-
-              "[جدید!] \n"
+              "⏪ ارسال پست و فایل بدون نام به کانال \n"
               "🎵 پیدا کردن آهنگ از روی وویس \n"
               "📥 دانلود آهنگ از طریق لینک دانلود \n"
               "📥 دانلود ویدیو از طریق لینک اینستاگرام \n\n\n"
@@ -381,6 +378,18 @@ keys = {
     COINS_100: {
         "en": "100 coin: ",
         "fa": "100 سکه: ",
+    },
+    COINS_20_BUY: {
+        "en": "20 coin buy",
+        "fa": "خرید 20 سکه",
+    },
+    COINS_50_BUY: {
+        "en": "50 coin buy",
+        "fa": "خرید 50 سکه",
+    },
+    COINS_100_BUY: {
+        "en": "100 coin buy",
+        "fa": "خرید 100 سکه",
     },
     NUMBER_OF_FILE_SENT: {
         "en": "Number of file sent: ",
