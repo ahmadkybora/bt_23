@@ -4,6 +4,7 @@ import os
 
 import music_tag
 from orator import Model
+from persiantools import digits
 from telegram.error import TelegramError
 from telegram.ext import Updater, CallbackContext, CommandHandler, MessageHandler, Filters, \
      Defaults, PicklePersistence
@@ -17,7 +18,8 @@ from utils import translate_key_to, reset_user_data_context, generate_start_over
 create_user_directory, download_file, generate_back_button_keyboard, increment_usage_counter_for_user, delete_file, \
 generate_module_selector_keyboard, generate_module_selector_video_keyboard, generate_tag_editor_keyboard, \
 generate_music_info, generate_tag_editor_video_keyboard, generate_module_selector_voice_keyboard, save_tags_to_file, \
-ffmpegcommand, myffmpegcommand, video_to_gif, generate_module_setting_keyboard, generate_module_coin_pay
+ffmpegcommand, myffmpegcommand, video_to_gif, generate_module_setting_keyboard, generate_module_coin_pay, \
+save_text_into_tag, parse_cutting_range
 
 from models.user import User
 from dbConfig import db
@@ -1174,10 +1176,45 @@ def finish(update: Update, context: CallbackContext) -> None:
             )
             logger.exception("Telegram error: %s", error)
     else :
-        message.reply_text(
-            translate_key_to(lp.ERR_ON_UPLOADING, lang),
-            reply_markup=start_over_button_keyboard
-        )
+        music_path = user_data['music_path']
+        new_art_path = user_data['new_art_path']
+        music_tags = user_data['tag_editor']
+        lang = user_data['language']
+        try:
+            save_tags_to_file(
+                file=music_path,
+                tags=music_tags,
+                new_art_path=new_art_path
+            )
+        except (OSError, BaseException):
+            message.reply_text(
+                translate_key_to(lp.ERR_ON_UPDATING_TAGS, lang),
+                reply_markup=start_over_button_keyboard
+            )
+            logger.error("Error on updating tags for file %s's file.", music_path, exc_info=True)
+            return
+
+        try:
+            with open(music_path, 'rb') as music_file:
+                context.bot.send_audio(
+                    audio=music_file,
+                    duration=user_data['music_duration'],
+                    chat_id=update.message.chat_id,
+                    caption=f"🆔 {BOT_USERNAME}",
+                    reply_markup=start_over_button_keyboard,
+                    reply_to_message_id=user_data['music_message_id']
+                )
+        except (TelegramError, BaseException) as error:
+            message.reply_text(
+                translate_key_to(lp.ERR_ON_UPLOADING, lang),
+                reply_markup=start_over_button_keyboard
+            )
+            logger.exception("Telegram error: %s", error)
+
+        # message.reply_text(
+        #     translate_key_to(lp.ERR_ON_UPLOADING, lang),
+        #     reply_markup=start_over_button_keyboard
+        # )
         # logger.exception("Telegram error: %s", error)
         # try:
         #     with open(video_path, 'rb') as video_file:
@@ -1250,6 +1287,139 @@ def finish_editing_tags(update: Update, context: CallbackContext) -> None:
     reset_user_data_context(context)
 
 # def handle_responses(update: Update, context: CallbackContext) -> None:
+    # message = update.message
+    # message_text = digits.ar_to_fa(digits.fa_to_en(message.text))
+    # user_data = context.user_data
+    # music_path = user_data['music_path']
+    # art_path = user_data['art_path']
+    # music_tags = user_data['tag_editor']
+    # current_tag = music_tags.get('current_tag')
+    # lang = user_data['language']
+
+    # logging.info(
+    #     "%s:%s:%s",
+    #     update.effective_user.id,
+    #     update.effective_user.username,
+    #     update.message.text
+    # )
+
+    # current_active_module = user_data['current_active_module']
+
+    # tag_editor_keyboard = generate_tag_editor_keyboard(lang)
+
+    # module_selector_keyboard = generate_module_selector_keyboard(lang)
+
+    # back_button_keyboard = generate_back_button_keyboard(lang)
+    # start_over_button_keyboard = generate_start_over_keyboard(lang)
+
+    # if current_active_module == 'tag_editor':
+    #     if not current_tag:
+    #         reply_message = translate_key_to(lp.ASK_WHICH_TAG, lang)
+    #         message.reply_text(reply_message, reply_markup=tag_editor_keyboard)
+    #     elif current_tag == 'album_art':
+    #         reply_message = translate_key_to(lp.ASK_FOR_ALBUM_ART, lang)
+    #         message.reply_text(reply_message, reply_markup=tag_editor_keyboard)
+    #     else:
+    #         pass
+    #         # save_text_into_tag(
+    #         #     value=message_text,
+    #         #     current_tag=current_tag,
+    #         #     context=context,
+    #         #     is_number=current_tag in ('year', 'disknumber', 'tracknumber')
+    #         # )
+    #         reply_message = f"{translate_key_to(lp.DONE, lang)} " \
+    #                         f"{translate_key_to(lp.CLICK_PREVIEW_MESSAGE, lang)} " \
+    #                         f"{translate_key_to(lp.OR, lang).upper()}" \
+    #                         f" {translate_key_to(lp.CLICK_DONE_MESSAGE, lang).lower()}"
+    #         message.reply_text(reply_message, reply_markup=tag_editor_keyboard)
+    # elif current_active_module == 'music_cutter':
+    #     try:
+    #         pass
+    #         # beginning_sec, ending_sec = parse_cutting_range(message_text)
+    #     except (ValueError, BaseException):
+    #         reply_message = translate_key_to(lp.ERR_MALFORMED_RANGE, lang).format(
+    #             translate_key_to(lp.MUSIC_CUTTER_HELP, lang),
+    #         )
+    #         message.reply_text(reply_message, reply_markup=back_button_keyboard)
+    #         return
+    #     music_path_cut = f"{music_path}_cut.mp3"
+    #     music_duration = user_data['music_duration']
+
+    #     if beginning_sec > music_duration or ending_sec > music_duration:
+    #         reply_message = translate_key_to(lp.ERR_OUT_OF_RANGE, lang).format(
+    #             (music_duration))
+    #         message.reply_text(reply_message)
+    #         message.reply_text(
+    #             translate_key_to(lp.MUSIC_CUTTER_HELP, lang),
+    #             reply_markup=back_button_keyboard
+    #         )
+    #     elif beginning_sec >= ending_sec:
+    #         reply_message = translate_key_to(lp.ERR_BEGINNING_POINT_IS_GREATER, lang)
+    #         message.reply_text(reply_message)
+    #         message.reply_text(
+    #             translate_key_to(lp.MUSIC_CUTTER_HELP, lang),
+    #             reply_markup=back_button_keyboard
+    #         )
+    #     else:
+    #         diff_sec = ending_sec - beginning_sec
+
+    #         os.system(
+    #             f"ffmpeg -y -ss {beginning_sec} -t {diff_sec} -i {music_path} -acodec copy \
+    #             {music_path_cut}"
+    #         )
+
+    #         try:
+    #             save_tags_to_file(
+    #                 file=music_path_cut,
+    #                 tags=music_tags,
+    #                 new_art_path=art_path if art_path else ''
+    #             )
+    #         except (OSError, BaseException):
+    #             update.message.reply_text(translate_key_to(lp.ERR_ON_UPDATING_TAGS, lang))
+    #             logger.error(
+    #                 "Error on updating tags for file %s's file.",
+    #                 music_path_cut,
+    #                 exc_info=True
+    #             )
+
+    #         try:
+    #             with open(music_path_cut, 'rb') as music_file:
+    #                 # FIXME: After sending the file, the album art can't be read back
+    #                 context.bot.send_audio(
+    #                     audio=music_file,
+    #                     chat_id=update.message.chat_id,
+    #                     duration=diff_sec,
+    #                     caption=f"*From*: {convert_seconds_to_human_readable_form(beginning_sec)}\n"
+    #                             f"*To*: {convert_seconds_to_human_readable_form(ending_sec)}\n\n"
+    #                             f"🆔 {BOT_USERNAME}",
+    #                     reply_markup=start_over_button_keyboard,
+    #                     reply_to_message_id=user_data['music_message_id']
+    #                 )
+    #         except (TelegramError, BaseException) as error:
+    #             message.reply_text(
+    #                 translate_key_to(lp.ERR_ON_UPLOADING, lang),
+    #                 reply_markup=start_over_button_keyboard
+    #             )
+    #             logger.exception("Telegram error: %s", error)
+
+    #         delete_file(music_path_cut)
+
+    #         reset_user_data_context(context)
+    # else:
+    #     if music_path:
+    #         if user_data['current_active_module']:
+    #             message.reply_text(
+    #                 translate_key_to(lp.ASK_WHICH_MODULE, lang),
+    #                 reply_markup=module_selector_keyboard
+    #             )
+    #     elif not music_path:
+    #         message.reply_text(translate_key_to(lp.START_OVER_MESSAGE, lang))
+    #     else:
+    #         # Not implemented
+    #         reply_message = translate_key_to(lp.ERR_NOT_IMPLEMENTED, lang)
+    #         message.reply_text(reply_message)
+
+def handle_responses(update: Update, context: CallbackContext) -> None:
     message = update.message
     message_text = digits.ar_to_fa(digits.fa_to_en(message.text))
     user_data = context.user_data
@@ -1283,13 +1453,12 @@ def finish_editing_tags(update: Update, context: CallbackContext) -> None:
             reply_message = translate_key_to(lp.ASK_FOR_ALBUM_ART, lang)
             message.reply_text(reply_message, reply_markup=tag_editor_keyboard)
         else:
-            pass
-            # save_text_into_tag(
-            #     value=message_text,
-            #     current_tag=current_tag,
-            #     context=context,
-            #     is_number=current_tag in ('year', 'disknumber', 'tracknumber')
-            # )
+            save_text_into_tag(
+                value=message_text,
+                current_tag=current_tag,
+                context=context,
+                is_number=current_tag in ('year', 'disknumber', 'tracknumber')
+            )
             reply_message = f"{translate_key_to(lp.DONE, lang)} " \
                             f"{translate_key_to(lp.CLICK_PREVIEW_MESSAGE, lang)} " \
                             f"{translate_key_to(lp.OR, lang).upper()}" \
@@ -1297,8 +1466,7 @@ def finish_editing_tags(update: Update, context: CallbackContext) -> None:
             message.reply_text(reply_message, reply_markup=tag_editor_keyboard)
     elif current_active_module == 'music_cutter':
         try:
-            pass
-            # beginning_sec, ending_sec = parse_cutting_range(message_text)
+            beginning_sec, ending_sec = parse_cutting_range(message_text)
         except (ValueError, BaseException):
             reply_message = translate_key_to(lp.ERR_MALFORMED_RANGE, lang).format(
                 translate_key_to(lp.MUSIC_CUTTER_HELP, lang),
@@ -1310,7 +1478,7 @@ def finish_editing_tags(update: Update, context: CallbackContext) -> None:
 
         if beginning_sec > music_duration or ending_sec > music_duration:
             reply_message = translate_key_to(lp.ERR_OUT_OF_RANGE, lang).format(
-                (music_duration))
+                convert_seconds_to_human_readable_form(music_duration))
             message.reply_text(reply_message)
             message.reply_text(
                 translate_key_to(lp.MUSIC_CUTTER_HELP, lang),
@@ -1572,7 +1740,9 @@ def main():
         (Filters.regex('^(🖼 Album Art)$') | Filters.regex('^(🖼 عکس آلبوم)$')),
         prepare_for_album_art)
     )
-
+    ##########
+    add_handler(MessageHandler(Filters.text, handle_responses))
+    ##########
     updater.start_polling()
     updater.idle()
 

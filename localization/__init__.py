@@ -13,6 +13,8 @@ ASK_FOR_TITLE = "ASK_FOR_TITLE"
 ASK_FOR_GENRE = "ASK_FOR_GENRE"
 ASK_FOR_YEAR = "ASK_FOR_YEAR"
 ASK_FOR_ALBUM_ART = "ASK_FOR_ALBUM_ART"
+ASK_FOR_DISK_NUMBER = "ASK_FOR_DISK_NUMBER"
+ASK_FOR_TRACK_NUMBER = "ASK_FOR_TRACK_NUMBER"
 ALBUM_ART_CHANGED = "ALBUM_ART_CHANGED"
 EXPECTED_NUMBER_MESSAGE = "EXPECTED_NUMBER_MESSAGE"
 CLICK_PREVIEW_MESSAGE = "CLICK_PREVIEW_MESSAGE"
@@ -36,6 +38,7 @@ ERR_ON_UPLOADING = "ERR_ON_UPLOADING"
 ERR_NOT_IMPLEMENTED = "ERR_NOT_IMPLEMENTED"
 ERR_OUT_OF_RANGE = "ERR_OUT_OF_RANGE"
 ERR_MALFORMED_RANGE = "ERR_MALFORMED_RANGE"
+ERR_BEGINNING_POINT_IS_GREATER = "ERR_BEGINNING_POINT_IS_GREATER"
 BTN_TAG_EDITOR = "BTN_TAG_EDITOR"
 BTN_CONVERT_VIDEO_TO_CIRCLE = "BTN_CONVERT_VIDEO_TO_CIRCLE"
 BTN_CONVERT_VIDEO_TO_GIF = "BTN_CONVERT_VIDEO_TO_GIF"
@@ -167,6 +170,14 @@ keys = {
         "en": "Send me a photo:",
         "fa": "یک عکس برام بفرست:",
     },
+    ASK_FOR_DISK_NUMBER: {
+        "en": "Enter the disk number:",
+        "fa": "شماره دیسک را وارد کنید:",
+    },
+    ASK_FOR_TRACK_NUMBER: {
+        "en": "Enter the track number:",
+        "fa": "شماره ترک را وارد کنید:",
+    },
     CLICK_PREVIEW_MESSAGE: {
         "en": "If you want to preview your changes click /preview.",
         "fa": "اگر میخوای تغییرات رو تا الان ببینی از دستور /preview استفاده کن.",
@@ -242,6 +253,10 @@ keys = {
     ERR_NOT_IMPLEMENTED: {
         "en": "This feature has not been implemented yet. Sorry!",
         "fa": "این قابلیت هنوز پیاده سازی نشده. شرمنده!",
+    },
+    ERR_BEGINNING_POINT_IS_GREATER: {
+        "en": "The ending point should be greater than starting point",
+        "fa": "زمان پایان باید از زمان شروع بزرگتر باشد.",
     },
     BTN_TAG_EDITOR: {
         "en": "🎵 Tag Editor",
