@@ -1419,6 +1419,10 @@ def finish_editing_tags(update: Update, context: CallbackContext) -> None:
     #         reply_message = translate_key_to(lp.ERR_NOT_IMPLEMENTED, lang)
     #         message.reply_text(reply_message)
 
+def send_to_others(update: Update, context: CallbackContext) -> None:
+    pass
+def send_to_channel(update: Update, context: CallbackContext) -> None:
+    pass
 def handle_responses(update: Update, context: CallbackContext) -> None:
     message = update.message
     message_text = digits.ar_to_fa(digits.fa_to_en(message.text))
@@ -1739,6 +1743,16 @@ def main():
     add_handler(MessageHandler(
         (Filters.regex('^(🖼 Album Art)$') | Filters.regex('^(🖼 عکس آلبوم)$')),
         prepare_for_album_art)
+    )
+    ##########
+    add_handler(MessageHandler(
+        (Filters.regex('^(🔊 send to others)$') | Filters.regex('^(🔊 ارسال به دیگران)$')),
+        send_to_others)
+    )
+    ##########
+    add_handler(MessageHandler(
+        (Filters.regex('^(🔊 send to channel)$') | Filters.regex('^(🔊 ارسال به کانال)$')),
+        send_to_channel)
     )
     ##########
     add_handler(MessageHandler(Filters.text, handle_responses))

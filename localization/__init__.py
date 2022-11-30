@@ -74,6 +74,8 @@ COINS_100 = "COINS_100"
 COINS_20_BUY = "COINS_20_BUY"
 COINS_50_BUY = "COINS_50_BUY"
 COINS_100_BUY = "COINS_100_BUY"
+SEND_TO_OTHERS = "SEND_TO_OTHERS"
+SEND_TO_CHANNEL = "SEND_TO_CHANNEL"
 REPORT_BUG_MESSAGE_EN = "That's my fault! Please send a bug report here: @jojo"
 REPORT_BUG_MESSAGE_FA = "این اشتباه منه! لطفا این باگ رو از اینجا گزارش کنید: @jojo"
 EG_EN = "e.g."
@@ -405,6 +407,14 @@ keys = {
     COINS_100_BUY: {
         "en": "100 coin buy",
         "fa": "خرید 100 سکه",
+    },
+    SEND_TO_CHANNEL: {
+        "en": "send to channel",
+        "fa": "ارسال به کانال",
+    },
+    SEND_TO_OTHERS: {
+        "en": "send to others",
+        "fa": "ارسال به دیگران",
     },
     NUMBER_OF_FILE_SENT: {
         "en": "Number of file sent: ",
